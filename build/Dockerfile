@@ -1,5 +1,5 @@
 FROM golang:alpine AS builder
-WORKDIR $GOPATH/src/K8s-Route-Extender/
+WORKDIR $GOPATH/src/k8s-route-extender/
 COPY cmd/ cmd
 COPY version/ version
 COPY vendor/ vendor  
