@@ -6,5 +6,4 @@ import (
 
 func main(){
 	route.Create()
-//	route.Delete()
 }

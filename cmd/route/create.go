@@ -105,7 +105,7 @@ func (api *KubernetesAPIServer)CreateK8sConfigMap(input *Input)(string, error){
 	configMapName := "k8s-route-extender"
 	configMaps, err := api.Client.CoreV1().ConfigMaps(input.NameSpace).Get(configMapName, metav1.GetOptions{})
         if err != nil {
-		configMap := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: configMapName}}
+		configMap := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: configMapName}, Data: map[string]string{"EndpointIP": input.RemoteIP},}
 		configMaps, err = api.Client.CoreV1().ConfigMaps(input.NameSpace).Create(configMap)
 		if err == nil {
 			return "k8s-route-extender", err
@@ -263,7 +263,7 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
         }
         command := []string{"/bin/bash", "-c"}
         args := []string{
-                "ip link add citrixvxlan0 type vxlan id ${vni}  dev eth0  dstport 0; ip addr add $(address) dev citrixvxlan0; ip link set up dev citrixvxlan0; vtepmac=`ifconfig citrixvxlan0 | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}' `; echo \"InterfaceInfo ${vtepmac}\"; theIPaddress=`ip -4 addr show citrixvxlan0  | grep inet | awk '{print $2}' | cut -d/ -f1`;  hostip=`ip -4 addr show eth0  | grep inet | awk '{print $2}' | cut -d/ -f1`; echo \"IP Addredd ${theIPaddress}\"; echo \"Host IP Address ${hostip}\"; `kubectl patch configmap ${configMap} -n ${nameSpace}  -p '{\"data\":{\"'\"Mac-$hostip\"'\": \"'\"$vtepmac\"'\"}}'`;  `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Interface-$hostip\"'\": \"'\"$theIPaddress\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Node-$hostip\"'\": \"'\"$hostip\"'\"}}'`;  ip route add ${network}  via  ${nexthop} dev citrixvxlan0 onlink; bridge fdb add ${ingmac} dev citrixvxlan0 dst ${vtepip}; sleep 3d;"}
+                "ip link delete routervxlan0; ip link add routervxlan0 type vxlan id ${vni}  dev ${eth}  dstport {$vxlanPort}; ip addr add $(address) dev routervxlan0; ip link set up dev routervxlan0; vtepmac=`ifconfig routervxlan0 | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}' `; echo \"InterfaceInfo ${vtepmac}\"; theIPaddress=`ip -4 addr show routervxlan0  | grep inet | awk '{print $2}' | cut -d/ -f1`;  hostip=`ip -4 addr show ${eth}  | grep inet | awk '{print $2}' | cut -d/ -f1`; echo \"IP Addredd ${theIPaddress}\"; echo \"Host IP Address ${hostip}\"; cniaddr=`ip -4 addr show ${ifName} | grep inet | awk '{print $2}'`; echo \"CNI IP Address ${cniaddr}\";  `kubectl patch configmap ${configMap} -n ${nameSpace}  -p '{\"data\":{\"'\"Mac-$hostip\"'\": \"'\"$vtepmac\"'\"}}'`;  `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Interface-$hostip\"'\": \"'\"$theIPaddress\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Node-$hostip\"'\": \"'\"$hostip\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"CNI-$hostip\"'\": \"'\"$cniaddr\"'\"}}'`;  ip route add ${network}  via  ${nexthop} dev routervxlan0 onlink; bridge fdb add ${ingmac} dev routervxlan0 dst ${vtepip}; sleep 3d;"}
 
 
         SecurityContext := new(v1.SecurityContext)
@@ -280,7 +280,7 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
                         Containers: []v1.Container{
                                 {
                                         Name:            "kuberoutesextender" + strconv.Itoa(podcount),
-                                        Image:           "quay.io/citrix/dummynode:latest",
+                                        Image:           "quay.io/chorus/router:latest",
                                         Command:         command,
                                         Args:            args,
                                         SecurityContext: SecurityContext,
@@ -291,7 +291,10 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
                                                 {Name: "vtepip", Value: input.RemoteVtepIP},
                                                 {Name: "configMap", Value: input.ConfigMap},
                                                 {Name: "nameSpace", Value: input.NameSpace},
+                                                {Name: "ifName", Value: input.InterfaceName},
+                                                {Name: "eth", Value: input.HostInterfaceName},
                                                 {Name: "vni", Value: input.Vnid},
+                                                {Name: "vxlanPort", Value: input.VxlanPort},
                                                 {Name: "address", Value: ifip},
                                         },
                                 },

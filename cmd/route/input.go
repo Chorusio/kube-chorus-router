@@ -20,7 +20,12 @@ type Input struct{
 	Netmask string
 	Vnid	string
 	RemoteVtepIP string
+	RemoteIP string
 	NextAddress string
+	InterfaceName string
+	HostInterfaceName string
+	CNIName string
+	VxlanPort string
 }
 
 func ValidateAddress(address string)bool{
@@ -119,6 +124,8 @@ func InitializeNodeIP(input *Input){
 	SubnetMasked := strings.Split(input.Network, ".")
         var network int
         var Network string
+	var HostMax string
+	var RemoteIP string
 	prefix,_ := strconv.Atoi(input.PrefixLen)
         if (prefix >= 24){
                 tmp_start := SubnetMasked[3]
@@ -126,6 +133,8 @@ func InitializeNodeIP(input *Input){
                 tmp2,_ := strconv.Atoi(PrefixSubnetTable[input.PrefixLen])
                 network = tmp & tmp2
                 Network = SubnetMasked[0]+"."+SubnetMasked[1]+"."+SubnetMasked[2]+"."+strconv.Itoa(network)
+		HostMax = SubnetMasked[0]+"."+SubnetMasked[1]+"."+SubnetMasked[2]+"."+strconv.Itoa(255-network)
+		RemoteIP = SubnetMasked[0]+"."+SubnetMasked[1]+"."+SubnetMasked[2]+"."+strconv.Itoa(255-network-1)
         } else if (prefix >= 16){
                 tmp_start := SubnetMasked[2]
                 tmp, _ := strconv.Atoi(tmp_start)
@@ -139,7 +148,9 @@ func InitializeNodeIP(input *Input){
                 network = tmp & tmp2
                 Network = SubnetMasked[0]+"."+strconv.Itoa(network)+".0.0"
         }
+	fmt.Printf("Host max is", HostMax, "Remote IP is", RemoteIP)
 	input.NextAddress = Network
+	input.RemoteIP = RemoteIP
 }
 
 func GetUserInput() (*Input){
@@ -167,6 +178,21 @@ func GetUserInput() (*Input){
 	input.Vnid = os.Getenv("VNID")
         if len(input.Vnid) == 0 {
                 fmt.Println("[ERROR] A unique VNID (VNID) is must for extending the route")
+                configError = 1
+        }
+	input.CNIName = os.Getenv("CNI_NAME")
+        if len(input.CNIName) == 0 {
+                fmt.Println("[ERROR] CNI_NAME (CNI_NAME [flannel, calico, openshift, canal etc]) is must for extending the route")
+                configError = 1
+        }
+	input.InterfaceName = "cni0"
+	input.HostInterfaceName = "eth0"
+	if (input.CNIName == "openshift"){
+		input.InterfaceName = "tun0"
+	}
+	input.VxlanPort = os.Getenv("VXLAN_PORT")
+        if len(input.VxlanPort) == 0 {
+                fmt.Println("[ERROR] VxlanPort (VXLAN_PORT) is must for extending the route")
                 configError = 1
         }
 	input.RemoteVtepIP = os.Getenv("REMOTE_VTEPIP")

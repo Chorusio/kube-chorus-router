@@ -5,11 +5,11 @@ metadata:
   name: k8s-route-extender
 rules:
   - apiGroups: ["*"]
-    resources: ["daemonsets", "nodes", "configmaps", "pods"]
+    resources: ["nodes", "configmaps", "pods"]
     verbs: ["get", "list", "watch", "create", "patch"]
 
   - apiGroups: [""]
-    resources: ["daemonsets", "nodes", "configmaps", "pods"]
+    resources: ["nodes", "configmaps", "pods"]
     verbs: ["get", "list", "watch", "create", "patch"]
 
   - apiGroups: ["extensions"]
@@ -64,8 +64,16 @@ spec:
       serviceAccountName: k8s-route-extender
       containers:
       - name: k8s-route-extender
-        image: "k8s-route-extender:latest"
+        image: "quay.io/chorus/chorus-k8s-route-extender:latest"
         imagePullPolicy: IfNotPresent
         env:
-        - name: ROUTE_PRIVATE_SUBNET
-          value: "xxx.xxx.xxx.xxx/xx"
+        - name: ADDRESS
+          value: "192.168.254.0/24"
+        - name: VNID
+          value: "200"
+        - name: CNI_NAME
+          value: "flannel"
+        - name: VXLAN_PORT
+          value: "8472"
+        - name: REMOTE_VTEPIP
+          value: "10.102.33.209"

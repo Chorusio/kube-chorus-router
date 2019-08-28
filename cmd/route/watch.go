@@ -65,8 +65,6 @@ func ParseNodeEvents(api *KubernetesAPIServer, obj interface{}, input *Input) *N
         if err = json.Unmarshal(originalObjJS, &originalNode); err != nil {
                 klog.Errorf("[ERROR] Failed to unmarshal original object: %v", err)
         }
-        //PodCIDR := originalNode.Spec.PodCIDR
-        //InternalIP, ExternalIP, HostName := GetNodeAddress(originalNode)
         InternalIP := "1.1.1.1"
 	ExternalIP := "1.1.1.1"
 	HostName := "abc"
