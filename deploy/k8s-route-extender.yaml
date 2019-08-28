@@ -1,3 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: k8s-route-extender
+  labels:
+    name: k8s-route-extender
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -5,15 +11,15 @@ metadata:
   name: k8s-route-extender
 rules:
   - apiGroups: ["*"]
-    resources: ["nodes", "configmaps", "pods"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts"]
     verbs: ["get", "list", "watch", "create", "patch"]
 
   - apiGroups: [""]
-    resources: ["nodes", "configmaps", "pods"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts"]
     verbs: ["get", "list", "watch", "create", "patch"]
 
   - apiGroups: ["extensions"]
-    resources: ["daemonsets", "ingresses/status"]
+    resources: ["pods", "configmaps", "serviceaccounts", "ingresses/status"]
     verbs: ["get", "list", "watch", "create"]
 ---
 kind: ClusterRoleBinding
@@ -27,17 +33,20 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: k8s-route-extender
+  namespace: k8s-route-extender
 apiVersion: rbac.authorization.k8s.io/v1
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: k8s-route-extender
+  namespace: k8s-route-extender
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: k8s-route-extender
+  namespace: k8s-route-extender
   labels:
     app: k8s-route-extender
 spec:
@@ -51,6 +60,7 @@ apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and befor
 kind: Deployment
 metadata:
   name: k8s-route-extender
+  namespace: k8s-route-extender
 spec:
   selector:
     matchLabels:
@@ -65,7 +75,7 @@ spec:
       containers:
       - name: k8s-route-extender
         image: "quay.io/chorus/chorus-k8s-route-extender:latest"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: ADDRESS
           value: "192.168.254.0/24"
