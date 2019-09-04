@@ -1,5 +1,5 @@
 OWNER=Janrajc
-IMAGE_NAME=k8s-route-extender
+IMAGE_NAME=kube-chorus-router
 VERSION_FILE="../version/VERSION"
 version=1.0.0
 error=0.0.0
@@ -28,4 +28,4 @@ publish:
 
 clean:
 	docker rmi -f $$(docker images -q -f dangling=true) || true
-	docker rmi -f $$(docker images | awk '$$1 ~ /K8s-Route-Extender/ { print $$3}') || true
+	docker rmi -f $$(docker images | awk '$$1 ~ /kube-chorus-router/ { print $$3}') || true

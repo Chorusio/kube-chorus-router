@@ -3,8 +3,8 @@ WORKDIR $GOPATH/src/k8s-route-extender/
 COPY cmd/ cmd
 COPY version/ version
 COPY vendor/ vendor  
-RUN go build -o /go/bin/k8s-route-extender ./cmd/main.go
+RUN go build -o /go/bin/kube-chorus-router ./cmd/main.go
 
 FROM alpine
-COPY --from=builder /go/bin/k8s-route-extender /go/bin/k8s-route-extender
-ENTRYPOINT ["/go/bin/k8s-route-extender"]
+COPY --from=builder /go/bin/kube-chorus-router /go/bin/kube-chorus-router
+ENTRYPOINT ["/go/bin/kube-chorus-router"]

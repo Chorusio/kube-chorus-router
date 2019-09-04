@@ -39,7 +39,7 @@ func WatchNodeEvents(api *KubernetesAPIServer, input *Input){
                         CoreUpdateHandler(api, obj, newobj)
                 },
                 DeleteFunc: func(obj interface{}) {
-                        CoreDeleteHandler(api, obj, nil)
+                        CoreDeleteHandler(api, obj, input)
                 },
         },
         )
@@ -49,11 +49,15 @@ func WatchNodeEvents(api *KubernetesAPIServer, input *Input){
 }
 
 func CoreAddHandler(api *KubernetesAPIServer, obj interface{}, input *Input) {
-        ParseNodeEvents(api, obj, input)
+        node, originalNode := ParseNodeEvents(api, obj, input)
+        if node.Role != "Master" {
+                klog.Errorf("[WARNING] Does not have PodCIDR Information, CNC will Generate itself")
+                api.CreateKubeExtenderPod(obj, node, originalNode, input)
+        }
 }
 
 // ParseNodeEvents Parses the node object and store the fields to Node.
-func ParseNodeEvents(api *KubernetesAPIServer, obj interface{}, input *Input) *Node {
+func ParseNodeEvents(api *KubernetesAPIServer, obj interface{}, input *Input) (*Node, v1.Node) {
         node := new(Node)
         node.Role = ""
         node.Label = ""
@@ -65,28 +69,23 @@ func ParseNodeEvents(api *KubernetesAPIServer, obj interface{}, input *Input) *N
         if err = json.Unmarshal(originalObjJS, &originalNode); err != nil {
                 klog.Errorf("[ERROR] Failed to unmarshal original object: %v", err)
         }
-        InternalIP := "1.1.1.1"
-	ExternalIP := "1.1.1.1"
-	HostName := "abc"
-        node.IPAddr = InternalIP
-        node.HostName = HostName
-        node.ExternalIPAddr = ExternalIP
         if originalNode.Spec.Taints != nil {
                 klog.Info("[INFO] Taint Information", originalNode.Spec.Taints)
                 ParseNodeRoles(node, originalNode)
                 klog.Info("[INFO] Setting Node Role", node.Role)
         }
-        if node.Role != "Master" {
-                klog.Errorf("[WARNING] Does not have PodCIDR Information, CNC will Generate itself")
-                api.CreateKubeExtenderPod(obj, node, originalNode, input)
-        }
-        return node
+        return node, originalNode
 }
 
 
 func CoreUpdateHandler(api *KubernetesAPIServer, obj interface{}, newobj interface{}) {
 	return
 }
-func CoreDeleteHandler(api *KubernetesAPIServer, obj interface{}, newobj interface{}) {
+func CoreDeleteHandler(api *KubernetesAPIServer, obj interface{}, input *Input) {
+        node, originalNode := ParseNodeEvents(api, obj, input)
+        if node.Role != "Master" {
+                klog.Errorf("[INFO] Updating the Node information")
+                api.DeleteKubeExtenderPod(obj, node, originalNode, input)
+        }
 	return
 }

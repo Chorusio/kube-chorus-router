@@ -91,6 +91,14 @@ func ExtractNetworkAndPrefix(address string)(string, string){
 
 var PrefixSubnetTable = make(map[string]string)
 func InitPrefixSubnetTable(){
+        PrefixSubnetTable["0"] = "0"
+        PrefixSubnetTable["1"] = "128"
+        PrefixSubnetTable["2"] = "192"
+        PrefixSubnetTable["3"] = "224"
+        PrefixSubnetTable["4"] = "240"
+        PrefixSubnetTable["5"] = "248"
+        PrefixSubnetTable["6"] = "252"
+        PrefixSubnetTable["7"] = "254"
         PrefixSubnetTable["8"] = "0"
         PrefixSubnetTable["9"] = "128"
         PrefixSubnetTable["10"] = "192"
@@ -141,12 +149,16 @@ func InitializeNodeIP(input *Input){
                 tmp2,_ := strconv.Atoi(PrefixSubnetTable[input.PrefixLen])
                 network = tmp & tmp2
                 Network = SubnetMasked[0]+"."+SubnetMasked[1]+"."+strconv.Itoa(network)+".0"
+		HostMax = SubnetMasked[0]+"."+SubnetMasked[1]+"."+strconv.Itoa(255-network)+".255"
+		RemoteIP = SubnetMasked[0]+"."+SubnetMasked[1]+"."+strconv.Itoa(255-network-1)+".254"
         }else if (prefix >= 8){
                 tmp_start := SubnetMasked[1]
                 tmp, _ := strconv.Atoi(tmp_start)
                 tmp2,_ := strconv.Atoi(PrefixSubnetTable[input.PrefixLen])
                 network = tmp & tmp2
                 Network = SubnetMasked[0]+"."+strconv.Itoa(network)+".0.0"
+		HostMax = SubnetMasked[0]+"."+strconv.Itoa(255-network)+"255.255"
+		RemoteIP = SubnetMasked[0]+"."+strconv.Itoa(255-network-1)+"254.254"
         }
 	fmt.Printf("Host max is", HostMax, "Remote IP is", RemoteIP)
 	input.NextAddress = Network
@@ -187,8 +199,12 @@ func GetUserInput() (*Input){
         }
 	input.InterfaceName = "cni0"
 	input.HostInterfaceName = "eth0"
-	if (input.CNIName == "openshift"){
+	if (input.CNIName == "openshift-azure"){
 		input.InterfaceName = "tun0"
+		input.HostInterfaceName = "ens3"
+	}else if (input.CNIName == "openshift"){
+		input.InterfaceName = "tun0"
+		input.HostInterfaceName = "eth0"
 	}
 	input.VxlanPort = os.Getenv("VXLAN_PORT")
         if len(input.VxlanPort) == 0 {
