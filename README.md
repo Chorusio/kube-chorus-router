@@ -102,7 +102,7 @@ Refer the [deployment](deploy/README.md) page for running kube-router as a micro
 
 ## Issues
 
-Describe the Issue in Details, Collects the logs and Use the github issue template  to raise it.
+Use github issue template to report any bug. Describe the bug in details and capture the logs and share.
 
 ## Code of conduct
 

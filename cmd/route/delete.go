@@ -16,7 +16,7 @@ func (api *KubernetesAPIServer)DeleteKubeExtenderPod(obj interface{}, node *Node
                         return
         	}else{
 			fmt.Println("[INFO] Configmap output before update", configMaps.Data)
-			nodeid := "Node-"+labels[1]
+			nodeid := "Host-"+labels[1]
 			value := configMaps.Data[nodeid]
 			delete(configMaps.Data, nodeid);
 			delete(configMaps.Data, "Node-"+value);
