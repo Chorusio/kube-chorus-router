@@ -1,5 +1,5 @@
 # kube-router
-K8s Route Extender is a solution to establish route between Kubernetes  cluster Nodes and non Kubernetes nodes.  This is use-full for ingress resource where  service IP's (Pod IP) can be configured on Ingress device for load balancing front end applications.  kube-router makes sure there is route exist between Kubernetes and Ingress device.
+Chorus kube router is a solution to establish route between Kubernetes  cluster Nodes and non Kubernetes nodes.  This is use-full for ingress resource where  service IP's (Pod IP) can be configured on Ingress device for load balancing front end applications.  kube-router can be used for creating a route between Kubernetes and Ingress device.
 
 [![Build Status](https://travis-ci.com/janraj/citrix-k8s-node-controller.svg?token=GfEuWKxn7TJJesWboygR&branch=master)](https://travis-ci.com/janraj/citrix-k8s-node-controller)
 [![codecov](https://codecov.io/gh/janraj/citrix-k8s-node-controller/branch/master/graph/badge.svg?token=9c5R8ukQGY)](https://codecov.io/gh/janraj/citrix-k8s-node-controller)
@@ -13,7 +13,7 @@ K8s Route Extender is a solution to establish route between Kubernetes  cluster 
 
 # kube-router
 
-kube-router is a micro service provided by Chorus that creates network between the Kubernetes cluster nodes and non kubernetes aware devices like F5, Citrix ADC etc. 
+kube-router is a micro service provided by Chorus that creates network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, Citrix ADC]. 
 
 
 ## Contents
@@ -28,7 +28,7 @@ kube-router is a micro service provided by Chorus that creates network between t
 
 ## Overview
 
-In Kubernetes environments, when you expose the services for external access through the Ingress device, to route the traffic into the cluster, you need to appropriately configure the network between the Kubernetes nodes and the Ingress device. Configuring the network is challenging as the pods use private IP addresses based on the CNI framework. Without proper network configuration, the Ingress device cannot access these private IP addresses. Also, manually configuring the network to ensure such reachability is cumbersome in Kubernetes environments.
+In Kubernetes environments, when you expose the services for external access through the ingress device, to route the traffic into the cluster, you need to appropriately configure the network between the Kubernetes nodes and the Ingress device. Configuring the network is challenging as the pods use private IP addresses based on the CNI framework. Without proper network configuration, the Ingress device cannot access these private IP addresses. Also, manually configuring the network to ensure such reachability is cumbersome in Kubernetes environments.
 
 Chorus provides a microservice called as **kube-router** that you can use to create the network between the cluster and the Ingress devices.
 
@@ -36,55 +36,27 @@ Chorus provides a microservice called as **kube-router** that you can use to cre
 
 The following diagram provides the high-level architecture of the kube-router:
 
-![](./images/CitrixControllerArchitecture.png)
+![](./docs/images/kube-router.png)
 
-The are the main components of the Citrix k8s node controller:
-       <details>
-       <summary>**Ingress Interface**</summary>
-	    The **Ingress interface** component is responsible for the interaction with Citrix ADC through NITRO REST API. It maintains the NITRO sessions and invokes it when required.
-       </details>
-       <details>
-       <summary>**K8s Interface**</summary>
-	    This **K8s Interface** component interacts with the Kube API server through K8s Go client. It ensures the availability of the client and maintains a healthy client session.
-       </details>
-       <details>
-       <summary>**Node Watcher**</summary>
-	    The **Node Watcher** component monitors the node events through K8s interface. It responds to the node events such as node addition, deletion, or modification with its callback functions.
-       </details>
-       <details>
-       <summary>**Input Feeder**</summary>
-	    The **Input Feeder** component provides inputs to the config decider. Some of the inputs are auto detected and the rest are taken from the Citrix k8s node controller deployment YAML file.
-       </details>
-       <details>
-       <summary>**Config Decider**</summary>
-	    The **Config Decider** component takes inputs from both the node watcher and the input feeder. Using the inputs it decides the best network automation required between the cluster and Citrix ADC.
-       </details>
-       <details>
-       <summary>**Core**</summary>
-	    The **Core** component interacts with the node watcher and updates the corresponding config engine. It is responsible for starting the best config engine for the corresponding cluster.
-       </details>
-       <details>
-       <summary>**Config Maps**</summary>
-	    The **Config Maps** component controls the Citrix k8s node controller.  It allows you to define Citrix k8s node controller to automatically create, apply, and delete routing configuration on Citrix ADC.
-       </details>
-
+kube-router creates a seperate network for any external devices and generate config-map file with network details. kube0router does the following 
+- Manage seperate subnet for non kubernetes aware node
+- Creates  vxlan overlays for the external non kubernetes aware nodes
+- Genrate a config-map file which can be used for creating other endpoint overlays
 ## How it works
 
 kube-router monitors the node events and establishes a route between the node to Citrix ADC using VXLAN. Citrix k8s node controller adds route on the Citrix ADC when a new node joins to the cluster. Similarly when a node leaves the cluster, Citrix k8s node controller removes the associated route from the Citrix ADC. Citrix k8s node controller uses VXLAN overlay between the Kubernetes cluster and Citrix ADC for service routing.
 
 ## Get started
 
-Citrix k8s node controller can be used in the following two ways:
+Chorus kube-router can be used in the following two ways:
 
--  In cluster Citrix k8s node controller configuration. In this configuration, the Citrix k8s node controller is run as **microservice**.
--  Out of the cluster Citrix k8s node controller configuration. In this configuration, the Citrix k8s node controller is run as a **process**.
+-  In cluster configuration. In this configuration, kube-router is run as **microservice**.
+-  Out of the cluster configuration. In this configuration, the chorus is run as a **process**.
 
->**Important:**
->Citrix recommends that you use **In cluster configuration** for production. And, use the **Out of cluster configuration** for easy development.
   
 ### Using kube-router as a process
 
-Before you deploy the kube-router package, ensure that you have installed Go binary for running MIC.
+Before you deploy the kube-router package, ensure that you have installed Go binary for running kube-router.
 
 Perform the following:
 
