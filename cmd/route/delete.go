@@ -1,6 +1,7 @@
 package route
 import (
         "fmt"
+	"k8s.io/klog"
         "strings"
         "k8s.io/api/core/v1"
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -8,6 +9,7 @@ import (
 
 func (api *KubernetesAPIServer)DeleteKubeExtenderPod(obj interface{}, node *Node, originalNode v1.Node, input *Input) {
 	labels := strings.Split(originalNode.Labels["NodeID"],"-")
+	klog.Info("[INFO] node label ia", labels)
 	fmt.Println("[INFO] Node labels", labels)
 	if len(labels) > 0 {
 		configMapName := "kube-chorus-router"

@@ -11,12 +11,12 @@ metadata:
   name: k8s-route-extender
 rules:
   - apiGroups: ["*"]
-    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts"]
-    verbs: ["get", "list", "watch", "create", "patch"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
 
   - apiGroups: [""]
-    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts"]
-    verbs: ["get", "list", "watch", "create", "patch"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
 
   - apiGroups: ["extensions"]
     resources: ["pods", "configmaps", "serviceaccounts", "ingresses/status"]
@@ -81,8 +81,6 @@ spec:
           value: "192.168.254.0/24"
         - name: VNID
           value: "200"
-        - name: CNI_NAME
-          value: "flannel"
         - name: VXLAN_PORT
           value: "8472"
         - name: REMOTE_VTEPIP

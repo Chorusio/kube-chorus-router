@@ -22,9 +22,8 @@ Perform the following:
 
     | Environment Variable | Mandatory or Optional | Description |
     | -------------------- | --------------------- | ----------- |
-    | ADDRESS | Mandatory | kube-router uses this address to configure the VTEP overlay end points on nodes.| 
+    | NETWORK | Mandatory | kube-router uses this network to configure the VTEP overlay end points on nodes.| 
     | VNID | Mandatory | A unique VNID tp create a VXLAn overlays between kubernetes nodes and ingress devices.|
-    | CNI_NAME | Mandatory | Provide the CNI name used in the cluster[flannel, calico, openshift-azure, etc].|
     | K8S_VXLAN_PORT | Mandatory | VXLAN PORT for overlays.|
     | REMOTE_VTEPIP | Mandatory | Ingress device VTEP IP|
 

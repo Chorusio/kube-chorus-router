@@ -22,9 +22,7 @@ type Input struct{
 	RemoteVtepIP string
 	RemoteIP string
 	NextAddress string
-	InterfaceName string
-	HostInterfaceName string
-	CNIName string
+	NodeCIDR string
 	VxlanPort string
 }
 
@@ -172,14 +170,14 @@ func GetUserInput() (*Input){
 		input.Mode = "Test"
 	}
         configError := 0
-	input.Address = os.Getenv("ADDRESS")
+	input.Address = os.Getenv("NETWORK")
         if len(input.Address) == 0 {
-                fmt.Println("[ERROR] New Private Subnet (ADDRESS Eg 192.168.1.0/16) is must for extending the route")
+                fmt.Println("[ERROR] New Private Subnet (NETWORK Eg 192.168.1.0/16) is must for extending the route")
                 configError = 1
         }else {
 		input.Network, input.PrefixLen = ExtractNetworkAndPrefix(input.Address)
 		if !(ValidateAddress(input.Network)){
-                	fmt.Println("[ERROR] Invalid Address format (ADDRESS Eg 192.168.1.2)")
+                	fmt.Println("[ERROR] Invalid Address format (NETWORK Eg 192.168.1.2)")
                 	configError = 1
 		}
 		if !(ValidatePrefixLen(input.PrefixLen)){
@@ -192,20 +190,6 @@ func GetUserInput() (*Input){
                 fmt.Println("[ERROR] A unique VNID (VNID) is must for extending the route")
                 configError = 1
         }
-	input.CNIName = os.Getenv("CNI_NAME")
-        if len(input.CNIName) == 0 {
-                fmt.Println("[ERROR] CNI_NAME (CNI_NAME [flannel, calico, openshift, canal etc]) is must for extending the route")
-                configError = 1
-        }
-	input.InterfaceName = "cni0"
-	input.HostInterfaceName = "eth0"
-	if (input.CNIName == "openshift-azure"){
-		input.InterfaceName = "tun0"
-		input.HostInterfaceName = "ens3"
-	}else if (input.CNIName == "openshift"){
-		input.InterfaceName = "tun0"
-		input.HostInterfaceName = "eth0"
-	}
 	input.VxlanPort = os.Getenv("VXLAN_PORT")
         if len(input.VxlanPort) == 0 {
                 fmt.Println("[ERROR] VxlanPort (VXLAN_PORT) is must for extending the route")
