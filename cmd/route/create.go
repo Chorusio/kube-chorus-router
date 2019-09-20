@@ -1,6 +1,7 @@
 package route
 
 import (
+	"github.com/google/uuid"
         "fmt"
 	"time"
 	"k8s.io/apimachinery/pkg/types"
@@ -22,8 +23,13 @@ var (
 	kubeconfig = filepath.Join(os.Getenv("HOME"), ".kube", "config")
 	config     *restclient.Config
 	err        error
-	podcount   = 0
 )
+
+func GenerateUUID() string {
+        uuid := uuid.New()
+        s := uuid.String()
+        return s
+}
 
 const (
         clusterRoleKind    = "ClusterRole"
@@ -251,11 +257,15 @@ func GenerateNextAddress(input *Input)string{
 }
 
 func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node, originalNode v1.Node, input *Input) {
-        podcount = podcount + 1
+        podcount := GenerateUUID()
+	if val, ok := originalNode.ObjectMeta.Labels["NodeID"]; ok {
+		tmp := strings.Split(val, "Node-")
+		podcount = tmp[1]
+	}
+	fmt.Println("[INFO]  Label Identifier", podcount)
 	ifip := GenerateNextAddress(input)
         klog.Info("[INFO] Generating PODCIDR and Node Information")
-        patchBytes := []byte(fmt.Sprintf(`{"metadata":{"labels":{"NodeID":"%s"}}}`, "Node-"+strconv.Itoa(podcount)))
-        time.Sleep(10 * time.Second) //TODO, We have to wait till Node is available.
+        patchBytes := []byte(fmt.Sprintf(`{"metadata":{"labels":{"NodeID":"%s"}}}`, "Node-"+podcount))
         if _, err = api.Client.CoreV1().Nodes().Patch(originalNode.Name, types.StrategicMergePatchType, patchBytes); err != nil {
                 klog.Errorf("[ERROR] Failed to Patch label %v", err)
         } else {
@@ -263,7 +273,7 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
         }
         command := []string{"/bin/bash", "-c"}
         args := []string{
-                "ifconfigdata=`ip addr show`; echo \"Interface Details ${ifconfigdata} \"; ethName=`ip route | grep  default | awk '$4 == \"dev\"{ print $5 }'`; ip link delete routervxlan0; ifNameA=`ip route | grep cni  | awk '$2 == \"dev\"{print $3}'`; ifNameB=`ip route | grep tun | grep link  | awk '$2 == \"dev\"{print $3}'`; echo \"IfnameA ${ifNameA} IfNameB ${ifNameB}\"; ifName=`if [[ ${ifNameA} =~ \"cni\" ]]; then echo ${ifNameA}; else echo ${ifNameB}; fi`; echo \"Host Interface ${ethName}\"; echo \"CNI Interface ${ifName}\";ip link add routervxlan0 type vxlan id ${vni}  dev $ethName  dstport ${vxlanPort}; ip addr add ${address} dev routervxlan0; ip link set up dev routervxlan0 mtu 1450; vtepmac=`ifconfig routervxlan0 | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}' `; echo \"InterfaceInfo ${vtepmac}\"; theIPaddress=`ip -4 addr show routervxlan0  | grep inet | awk '{print $2}' | cut -d/ -f1`;  hostip=`ip -4 addr show $ethName  | grep inet | awk '{print $2}' | cut -d/ -f1`; echo \"IP Addredd ${theIPaddress}\"; echo \"Host IP Address ${hostip}\"; cniaddr=`ip -4 addr show ${ifName} | grep inet | awk '{print $2}'`; echo \"CNI IP Address ${cniaddr}\"; `kubectl patch configmap ${configMap} -n ${nameSpace}  -p '{\"data\":{\"'\"Host-$nodeid\"'\": \"'\"$hostip\"'\"}}'`;  `kubectl patch configmap ${configMap} -n ${nameSpace}  -p '{\"data\":{\"'\"Mac-$hostip\"'\": \"'\"$vtepmac\"'\"}}'`;  `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Interface-$hostip\"'\": \"'\"$theIPaddress\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"CNI-$hostip\"'\": \"'\"$cniaddr\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Node-$hostip\"'\": \"'\"$hostip\"'\"}}'`; ip route add ${network}  via  ${nexthop} dev routervxlan0 onlink; bridge fdb add ${ingmac} dev routervxlan0 dst ${vtepip}; sleep 3d; iptables -A  OPENSHIFT-FIREWALL-ALLOW -p udp -m udp --dport ${vxlanPort} -m comment --comment \"VXLAN incoming\" -j ACCEPT"}
+                "ifconfigdata=`ip addr show`; echo \"Interface Details ${ifconfigdata} \"; ethName=`ip route | grep  default | awk '$4 == \"dev\"{ print $5 }'`; ip link delete routervxlan0; ifNameA=`ip route | grep cni  | awk '$2 == \"dev\"{print $3}'`; ifNameB=`ip route | grep tun | grep link  | awk '$2 == \"dev\"{print $3}'`; echo \"IfnameA ${ifNameA} IfNameB ${ifNameB}\"; ifName=`if [[ ${ifNameA} =~ \"cni\" ]]; then echo ${ifNameA}; else echo ${ifNameB}; fi`; echo \"Host Interface ${ethName}\"; echo \"CNI Interface ${ifName}\";ip link add routervxlan0 type vxlan id ${vni}  dev $ethName  dstport ${vxlanPort}; ip addr add ${address} dev routervxlan0; ip link set up dev routervxlan0 mtu 1450; vtepmac=`ifconfig routervxlan0 | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}' `; echo \"InterfaceInfo ${vtepmac}\"; theIPaddress=`ip -4 addr show routervxlan0  | grep inet | awk '{print $2}' | cut -d/ -f1`;  hostip=`ip -4 addr show $ethName  | grep inet | awk '{print $2}' | cut -d/ -f1`; echo \"IP Addredd ${theIPaddress}\"; echo \"Host IP Address ${hostip}\"; cniaddr=`ip -4 addr show ${ifName} | grep inet | awk '{print $2}'`; echo \"CNI IP Address ${cniaddr}\"; `kubectl patch configmap ${configMap} -n ${nameSpace}  -p '{\"data\":{\"'\"Host-$nodeid\"'\": \"'\"$hostip\"'\"}}'`;  `kubectl patch configmap ${configMap} -n ${nameSpace}  -p '{\"data\":{\"'\"Mac-$hostip\"'\": \"'\"$vtepmac\"'\"}}'`;  `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Interface-$hostip\"'\": \"'\"$theIPaddress\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"CNI-$hostip\"'\": \"'\"$cniaddr\"'\"}}'`; `kubectl patch configmap ${configMap} -n ${nameSpace} -p '{\"data\":{\"'\"Node-$hostip\"'\": \"'\"$hostip\"'\"}}'`; ip route add ${network}  via  ${nexthop} dev routervxlan0 onlink; bridge fdb add ${ingmac} dev routervxlan0 dst ${vtepip}; iptables -I INPUT 1 -p udp --dport ${vxlanPort} -j ACCEPT; sleep 3d"}
 
 
         SecurityContext := new(v1.SecurityContext)
@@ -272,15 +282,15 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
         SecurityContext.Capabilities = Capabilities
 	pod := &v1.Pod{
                 ObjectMeta: metav1.ObjectMeta{
-                        Name: "kube-chorus-router-" + strconv.Itoa(podcount),
+                        Name: "kube-chorus-router-" + podcount,
                 },
                 Spec: v1.PodSpec{
                         ServiceAccountName: input.ServiceAccount,
                         HostNetwork:        true,
                         Containers: []v1.Container{
                                 {
-                                        Name:            "kube-chorus-router-" + strconv.Itoa(podcount),
-                                        Image:           "quay.io/chorus/router:latest",
+                                        Name:            "kube-chorus-router-" + podcount,
+                                        Image:           "quay.io/chorus/router:1.1.0",
                                         Command:         command,
                                         Args:            args,
                                         SecurityContext: SecurityContext,
@@ -294,23 +304,26 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
                                                 {Name: "vni", Value: input.Vnid},
                                                 {Name: "vxlanPort", Value: input.VxlanPort},
                                                 {Name: "address", Value: ifip},
-                                                {Name: "nodeid", Value: strconv.Itoa(podcount)},
+                                                {Name: "nodeid", Value: podcount},
                                         },
                                 },
                         },
                 },
         }
         nodeSelector := make(map[string]string)
-        nodeSelector["NodeID"] = "Node-"+strconv.Itoa(podcount)
+        nodeSelector["NodeID"] = "Node-"+podcount
         pod.Spec.NodeSelector = nodeSelector
 	
         if _, err = api.Client.CoreV1().Pods(input.NameSpace).Create(pod); err != nil {
               klog.Error("Failed to Create a Pod " + err.Error())
         }
-        time.Sleep(60 * time.Second) //TODO, We have to wait till Pod is available.
+        time.Sleep(30 * time.Second) //TODO, We have to wait till Pod is available.
 
         pod, err = api.Client.CoreV1().Pods(input.NameSpace).Get(pod.Name, metav1.GetOptions{})
         if err != nil {
               fmt.Errorf("pod Get API error: %v \n pod: %v", err, pod)
         }
+        err = api.Client.CoreV1().Pods(input.NameSpace).Delete(pod.Name, metav1.NewDeleteOptions(90))
+	fmt.Println("DELETED POD", err)
 }
+

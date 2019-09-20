@@ -8,7 +8,7 @@ import (
 )
 
 func (api *KubernetesAPIServer)DeleteKubeExtenderPod(obj interface{}, node *Node, originalNode v1.Node, input *Input) {
-	labels := strings.Split(originalNode.Labels["NodeID"],"-")
+	labels := strings.Split(originalNode.Labels["NodeID"],"Node-")
 	klog.Info("[INFO] node label ia", labels)
 	fmt.Println("[INFO] Node labels", labels)
 	if len(labels) > 0 {
@@ -20,6 +20,7 @@ func (api *KubernetesAPIServer)DeleteKubeExtenderPod(obj interface{}, node *Node
 			fmt.Println("[INFO] Configmap output before update", configMaps.Data)
 			nodeid := "Host-"+labels[1]
 			value := configMaps.Data[nodeid]
+			fmt.Println("Label[0], Label[1], value", labels[0], labels[1], value)
 			delete(configMaps.Data, nodeid);
 			delete(configMaps.Data, "Node-"+value);
 			delete(configMaps.Data, "Mac-"+value);
