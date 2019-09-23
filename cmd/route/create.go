@@ -109,15 +109,13 @@ func (api *KubernetesAPIServer)CreateK8sServiceAccount(input *Input)(string, err
 
 func (api *KubernetesAPIServer)CreateK8sConfigMap(input *Input)(string, error){
 	configMapName := "kube-chorus-router"
-	configMaps, err := api.Client.CoreV1().ConfigMaps(input.NameSpace).Get(configMapName, metav1.GetOptions{})
-        if err != nil {
-		configMap := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: configMapName}, Data: map[string]string{"EndpointIP": input.RemoteIP},}
-		configMaps, err = api.Client.CoreV1().ConfigMaps(input.NameSpace).Create(configMap)
-		if err == nil {
-			return "kube-chorus-router", err
-		}else{
-			return "Error", err
-		}
+	api.Client.CoreV1().ConfigMaps(input.NameSpace).Delete(configMapName, metav1.NewDeleteOptions(0))
+	configMap := &v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: configMapName}, Data: map[string]string{"EndpointIP": input.RemoteIP},}
+	configMaps, err := api.Client.CoreV1().ConfigMaps(input.NameSpace).Create(configMap)
+	if err == nil {
+		return "kube-chorus-router", err
+	}else{
+		return "Error", err
 	}
 	fmt.Println("Config map object", configMaps)
 	return "kube-chorus-router", err
