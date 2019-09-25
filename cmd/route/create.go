@@ -78,7 +78,7 @@ func CreateK8sApiserverClient() (*KubernetesAPIServer, error) {
 func (api *KubernetesAPIServer)CreateK8sNameSpace()(string, error){
 	nameSpace := "kube-system"
 	nsObj, err := api.Client.CoreV1().Namespaces().Get(nameSpace,  metav1.GetOptions{})
-	fmt.Println("Name Space object", nsObj)
+	fmt.Println("[INFO] Name Space object", nsObj)
 	if err != nil {
 		nsSpec := &v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: nameSpace}}
 		nsObj, err = api.Client.CoreV1().Namespaces().Create(nsSpec)

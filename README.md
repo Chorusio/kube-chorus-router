@@ -44,7 +44,7 @@ kube-router creates a seperate network for any external devices and generate con
 - Genrate a config-map file which can be used for creating other endpoint overlays
 ## How it works
 
-kube-router monitors the node events and establishes a route between the node to Citrix ADC using VXLAN. Citrix k8s node controller adds route on the Citrix ADC when a new node joins to the cluster. Similarly when a node leaves the cluster, Citrix k8s node controller removes the associated route from the Citrix ADC. Citrix k8s node controller uses VXLAN overlay between the Kubernetes cluster and Citrix ADC for service routing.
+kube-router creates a route entry point in each node present in the kubernetes cluster. When a node leaves it removes the route entry on the node. This information keeps in configmap which can be used for extending the route  with other nodes. 
 
 ## Get started
 

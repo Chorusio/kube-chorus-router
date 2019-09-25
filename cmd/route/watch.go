@@ -85,7 +85,7 @@ func CoreDeleteHandler(api *KubernetesAPIServer, obj interface{}, input *Input) 
         node, originalNode := ParseNodeEvents(api, obj, input)
         if node.Role != "Master" {
                 klog.Info("[INFO] Deleting the Node from the cluster")
-                api.DeleteKubeExtenderPod(obj, node, originalNode, input)
+                api.DeleteKubeExtenderPod(originalNode, input)
         }
 	return
 }

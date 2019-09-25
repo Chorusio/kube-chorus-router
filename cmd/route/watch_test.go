@@ -19,6 +19,10 @@ func (api *KubernetesAPIServer)CreateNode(){
 	api.Client.CoreV1().Nodes().Create(NewNode)
 }
 
+func (api *KubernetesAPIServer)DeleteNode(){
+        fmt.Println("[INFO] Deleting a Dummy Node")
+	api.Client.CoreV1().Nodes().Delete("dummy", metav1.NewDeleteOptions(0))
+}
 func TestWatchNodeEvents(t *testing.T){
 //	assert := assert.New(t)
 	input := new(Input)
@@ -26,8 +30,7 @@ func TestWatchNodeEvents(t *testing.T){
 	input.NameSpace, _ = api.CreateK8sNameSpace()
 	api.CreateClusterRoles(input)
 	api.CreateClusterRoleBindings(input)
-	//api.CreateNode()
-	WatchNodeEvents(api, input)
-
+	api.CreateNode()
+	api.DeleteNode()
 }
 

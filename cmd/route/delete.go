@@ -7,7 +7,7 @@ import (
         metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (api *KubernetesAPIServer)DeleteKubeExtenderPod(obj interface{}, node *Node, originalNode v1.Node, input *Input) {
+func (api *KubernetesAPIServer)DeleteKubeExtenderPod(originalNode v1.Node, input *Input) {
 	labels := strings.Split(originalNode.Labels["NodeID"],"Node-")
 	klog.Info("[INFO] node label ia", labels)
 	fmt.Println("[INFO] Node labels", labels)

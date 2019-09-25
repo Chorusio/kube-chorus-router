@@ -126,6 +126,7 @@ func InitPrefixSubnetTable(){
 
 
 func InitializeNodeIP(input *Input){
+	fmt.Println("[INFO] Initializing Kube Router")
 	InitPrefixSubnetTable()
 	SubnetMasked := strings.Split(input.Network, ".")
         var network int
@@ -158,7 +159,7 @@ func InitializeNodeIP(input *Input){
 		HostMax = SubnetMasked[0]+"."+strconv.Itoa(255-network)+"255.255"
 		RemoteIP = SubnetMasked[0]+"."+strconv.Itoa(255-network-1)+"254.254"
         }
-	fmt.Printf("Host max is", HostMax, "Remote IP is", RemoteIP)
+	fmt.Println("[INFO] Host max is", HostMax, "Remote IP is", RemoteIP)
 	input.NextAddress = Network
 	input.RemoteIP = RemoteIP
 }

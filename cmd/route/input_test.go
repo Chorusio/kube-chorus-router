@@ -77,8 +77,8 @@ func TestInitializeNodeIP(t *testing.T) {
 
 func TestGetUserInput(t *testing.T) {
 	assert := assert.New(t)
-	Address := os.Getenv("ADDRESS")
-        os.Setenv("ADDRESS", "")
+	Address := os.Getenv("NETWORK")
+        os.Setenv("NETWORK", "")
         Vnid := os.Getenv("VNID")
         os.Setenv("VNID", "")
         Vtep := os.Getenv("REMOTE_VTEPIP")
@@ -100,14 +100,14 @@ func TestGetUserInput(t *testing.T) {
 	if Vtep == ""{
 		Vtep = "10.10.10.10"
 	}	
-        os.Setenv("ADDRESS", Address)
+        os.Setenv("NETWORK", Address)
         os.Setenv("VNID", Vnid)
         os.Setenv("REMOTE_VTEPIP", Vtep)
         input := GetUserInput()
 	assert.Equal(input.Address,  Address, "Parsed User succesfully")	
 	assert.Equal(input.Vnid,  Vnid, "Parsed User succesfully")	
 	assert.Equal(input.RemoteVtepIP,  Vtep, "Parsed User succesfully")	
-        os.Setenv("ADDRESS", "300.300.300.300/300")
+        os.Setenv("NETWORK", "300.300.300.300/300")
         func() {
                 defer func() {
                         if r := recover(); r == nil {
@@ -116,7 +116,7 @@ func TestGetUserInput(t *testing.T) {
                 }()
                 GetUserInput()
         }()
-        os.Setenv("ADDRESS", Address)
+        os.Setenv("NETWORK", Address)
 }
 
 
