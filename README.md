@@ -5,9 +5,9 @@ Chorus kube router is a solution to establish route between Kubernetes  cluster 
 [![codecov](https://codecov.io/gh/janraj/citrix-k8s-node-controller/branch/master/graph/badge.svg?token=9c5R8ukQGY)](https://codecov.io/gh/janraj/citrix-k8s-node-controller)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./license/LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/janraj/citrix-k8s-node-controller)](https://goreportcard.com/report/github.com/janraj/citrix-k8s-node-controller)
-[![Docker Repository on Quay](https://quay.io/repository/citrix/citrix-k8s-node-controller/status "Docker Repository on Quay")](https://quay.io/repository/citrix/citrix-k8s-node-controller)
-[![GitHub stars](https://img.shields.io/github/stars/janraj/citrix-k8s-node-controller.svg)](https://github.com/janraj/citrix-k8s-node-controller/stargazers)
-[![HitCount](http://hits.dwyl.com/janraj/citrix-k8s-node-controller.svg)](http://hits.dwyl.com/janraj/citrix-k8s-node-controller)
+[![Docker Repository on Quay](https://quay.io/repository/chorus/chorus-kube-router/status "Docker Repository on Quay")](https://quay.io/repository/chorus/chorus-kube-router)
+[![GitHub stars](https://img.shields.io/github/stars/Chorusio/K8s-Route-Extender.svg)](https://github.com/Chorusio/K8s-Route-Extender/stargazers)
+[![HitCount](http://hits.dwyl.io/Chorusio/K8s-Route-Extender.svg)](http://hits.dwyl.io/Chorusio/K8s-Route-Extender)
 
 ---
 
