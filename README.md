@@ -1,5 +1,5 @@
 # kube-router
-Chorus kube router is a solution to establish route between Kubernetes  cluster Nodes and non Kubernetes nodes.  This is use-full for ingress resource where  service IP's (Pod IP) can be configured on Ingress device for load balancing front end applications.  kube-router can be used for creating a route between Kubernetes and Ingress device.
+**Chorus kube router** is a solution to establish route between Kubernetes  cluster nodes and non Kubernetes nodes.  This is use-full for ingress resource where  service IP's (Pod IP) can be configured on Ingress device for load balancing front end applications. kube-router can be used for creating a route between Kubernetes and Ingress device. Nodeport and loadbalncer type service can reach to the pods irrespective network and subnet. However such solution reduces teh performance due to translation and load balancing at different level. So typically customer prefer ingress mechanism [Reach to pod directly from external load balancer] to to expose the route the service. **Chorus kube router** helps to create network connectivity for such kind of deployments.
 
 [![Build Status](https://travis-ci.com/janraj/citrix-k8s-node-controller.svg?token=GfEuWKxn7TJJesWboygR&branch=master)](https://travis-ci.com/janraj/citrix-k8s-node-controller)
 [![codecov](https://codecov.io/gh/janraj/citrix-k8s-node-controller/branch/master/graph/badge.svg?token=9c5R8ukQGY)](https://codecov.io/gh/janraj/citrix-k8s-node-controller)
@@ -13,7 +13,7 @@ Chorus kube router is a solution to establish route between Kubernetes  cluster 
 
 # kube-router
 
-kube-router is a micro service provided by Chorus that helps to create network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, Citrix ADC]. kube-router takes care of networking changes on kubernetes and produces a configmap output which can be used by vendors to establish route from thier devices to kubernetes cluster.
+**kube-router** is a micro service provided by **Chorus** that helps to create network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, A10, Citrix ADC]. kube-router takes care of networking changes on kubernetes and produces a configmap output which can be used by vendors to establish route from thier devices to kubernetes cluster.
 
 
 ## Contents
@@ -28,9 +28,9 @@ kube-router is a micro service provided by Chorus that helps to create network b
 
 ## Overview
 
-In Kubernetes environments, when you expose the services for external access through the ingress device, to route the traffic into the cluster, you need to appropriately configure the network between the Kubernetes nodes and the Ingress device. Configuring the network is challenging as the pods use private IP addresses based on the CNI framework. Without proper network configuration, the Ingress device cannot access these private IP addresses. Also, manually configuring the network to ensure such reachability is cumbersome in Kubernetes environments.
+In Kubernetes environments, when you expose the services for external access through the ingress device, to route the traffic into the cluster, you need to appropriately configure the network between the Kubernetes nodes and the Ingress device. Configuring the network is challenging as the pods use private IP addresses based on the CNI framework. Without proper network configuration, the Ingress device cannot access these private IP addresses. Also, manually configuring the network to ensure such reachability is cumbersome in Kubernetes environments. 
 
-Chorus provides a microservice called as **kube-router** that you can use to create the network between the cluster and the Ingress devices.
+**Chorus** provides a microservice called as **kube-router** that you can use to create the network between the cluster and the Ingress devices.
 
 ## Architecture
 
@@ -38,8 +38,8 @@ The following diagram provides the high-level architecture of the kube-router:
 
 ![](./docs/images/kube-router.png)
 
-kube-router creates a seperate network for any external devices and generate config-map file with network details. kube router does the following 
-- Manage seperate subnet for non kubernetes aware node
+**kube-router** creates a seperate network for any external devices and generate config-map file with network details. It does the following 
+- Manage seperate subnet for non kubernetes aware nodes
 - Creates  vxlan overlays for the external non kubernetes aware nodes
 - Genrate a config-map file which can be used for creating other endpoint overlays
 ## How it works
