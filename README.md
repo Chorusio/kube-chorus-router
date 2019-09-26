@@ -13,7 +13,7 @@ Chorus kube router is a solution to establish route between Kubernetes  cluster 
 
 # kube-router
 
-kube-router is a micro service provided by Chorus that creates network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, Citrix ADC]. 
+kube-router is a micro service provided by Chorus that helps to create network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, Citrix ADC]. kube-router takes care of networking changes on kubernetes and produces a configmap output which can be used by vendors to establish route from thier devices to kubernetes cluster.
 
 
 ## Contents
@@ -38,13 +38,45 @@ The following diagram provides the high-level architecture of the kube-router:
 
 ![](./docs/images/kube-router.png)
 
-kube-router creates a seperate network for any external devices and generate config-map file with network details. kube0router does the following 
+kube-router creates a seperate network for any external devices and generate config-map file with network details. kube router does the following 
 - Manage seperate subnet for non kubernetes aware node
 - Creates  vxlan overlays for the external non kubernetes aware nodes
 - Genrate a config-map file which can be used for creating other endpoint overlays
 ## How it works
 
-kube-router creates a route entry point in each node present in the kubernetes cluster. When a node leaves it removes the route entry on the node. This information keeps in configmap which can be used for extending the route  with other nodes. 
+kube-router creates a route entry point in each node present in the kubernetes cluster. When a node leaves it removes the route entry on the node. This information keeps in configmap which can be used for extending the route  with other nodes. Config map can be found in kube-system namespace with the endpoint details.
+
+
+
+```
+MacBook-Pro:k8s-route-extender$ kubectl get cm -n kube-system kube-chorus-router -o json
+{
+    "apiVersion": "v1",
+    "data": {
+        "CNI-10.106.170.62": "10.244.1.1/24",
+        "CNI-10.106.170.63": "10.244.6.1/24",
+        "EndpointIP": "192.168.1.254",
+        "Host-cb716e61-cab6-437e-a84a-d26a908260bc": "10.106.170.62",
+        "Host-d666ca12-5b2e-4716-a243-ece13e780122": "10.106.170.63",
+        "Interface-10.106.170.62": "192.168.254.1",
+        "Interface-10.106.170.63": "192.168.254.2",
+        "Mac-10.106.170.62": "76:13:e1:c7:4b:f6",
+        "Mac-10.106.170.63": "b2:30:00:b1:88:49",
+        "Node-10.106.170.62": "10.106.170.62",
+        "Node-10.106.170.63": "10.106.170.63"
+    },
+    "kind": "ConfigMap",
+    "metadata": {
+        "creationTimestamp": "2019-09-25T12:02:26Z",
+        "name": "kube-chorus-router",
+        "namespace": "kube-system",
+        "resourceVersion": "5439136",
+        "selfLink": "/api/v1/namespaces/kube-system/configmaps/kube-chorus-router",
+        "uid": "20f8407b-3871-4595-9bc4-d4eb65fb80b8"
+    }
+}
+MacBook-Pro:k8s-route-extender$ 
+``` 
 
 ## Get started
 
