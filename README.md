@@ -77,7 +77,7 @@ MacBook-Pro:k8s-route-extender$ kubectl get cm -n kube-system kube-chorus-router
 }
 MacBook-Pro:k8s-route-extender$ 
 ``` 
-
+There are two hosts present in the given cluster, which can be identified by Host tag [```Host-cb716e61-cab6-437e-a84a-d26a908260bc``` and ```Host-d666ca12-5b2e-4716-a243-ece13e780122```] both having values as 10.106.170.62 and 10.106.170.63 respectively. These are nodes IP in the cluster. kube router creates an interface for each node which has subnet of 192.168.254.1 and 192.168.254.2 which maps to CNI subnet of 10.244.1.1 10.244.6.1 respectively. 
 ## Get started
 
 Chorus kube-router can be used in the following two ways:
