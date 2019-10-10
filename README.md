@@ -1,5 +1,5 @@
 # kube-router
-**Chorus kube router** is a solution to establish route between Kubernetes  cluster nodes and non Kubernetes nodes.  This is use-full for ingress resource where  service IP's (Pod IP) can be configured on Ingress device for load balancing front end applications. kube-router can be used for creating a route between Kubernetes and Ingress device. A service of type nodeport and loadbalncer  can reach to the pods irrespective of network and subnet. However such solution reduces the performance due to translation and load balancing at different level. So typically customer prefer ingress mechanism [Reach to pod directly from external load balancer] to expose the route to the service. **Chorus kube router** helps to create network connectivity for such kind of deployments. **kube-router** is a micro service provided by **Chorus** that helps to create network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, A10, Citrix ADC]. kube-router takes care of networking changes on kubernetes and produces a configmap output which can be used by vendors to establish route from thier devices to kubernetes cluster.
+**Chorus kube router** is a plugin to establish route between Kubernetes  cluster nodes and non Kubernetes nodes.  This is use-full for ingress resource where  service IP's (Pod IP) can be configured on Ingress device for load balancing front end applications. kube-router can be used for creating a route between Kubernetes and Ingress device. A service of type nodeport and loadbalncer  can reach to the pods irrespective of network and subnet. However such solution reduces the performance due to translation and load balancing at different level. So typically customer prefer ingress mechanism [Reach to pod directly from external load balancer] to expose the route to the service. **Chorus kube router** helps to create network connectivity for such kind of deployments. **kube-router** is a micro service provided by **Chorus** that helps to create network between the Kubernetes cluster nodes and non kubernetes aware devices [F5, A10, Citrix ADC]. kube-router takes care of networking changes on kubernetes and produces a configmap output which can be used by vendors to establish route from thier devices to kubernetes cluster.
 
 [![Build Status](https://travis-ci.com/Chorusio/K8s-Route-Extender.svg?token=GfEuWKxn7TJJesWboygR&branch=master)](https://travis-ci.com/Chorusio/K8s-Route-Extender)
 [![codecov](https://codecov.io/gh/Chorusio/K8s-Route-Extender/branch/master/graph/badge.svg?token=9c5R8ukQGY)](https://codecov.io/gh/Chorusio/K8s-Route-Extender)
@@ -14,19 +14,30 @@
 
 # Contents
 
--  [Overview](#overview)
--  [Architecture](#architecture)
--  [How it works](#how-it-works)
--  [Get started](#get-started)
--  [Issues](#issues)
--  [Code of conduct](#code-of-conduct)
--  [License](#License)
+
+  +  [Overview](#overview)
+  +  [Supported platform](#supported platform)
+  +  [Architecture](#architecture)
+  +  [How it works](#how-it-works)
+  +  [Get started](#get-started)
+    + [Using kube-router as a process](#using kube-router as a process)
+    + [Using kube-router as a microservice](#using kube-router as a microservice)
+  +  [Issues](#issues)
+  +  [Code of conduct](#code-of-conduct)
+  +  [License](#License)
 
 # Overview
 
 In Kubernetes environments, when you expose the services for external access through the ingress device, to route the traffic into the cluster, you need to appropriately configure the network between the Kubernetes nodes and the Ingress device. Configuring the network is challenging as the pods use private IP addresses based on the CNI framework. Without proper network configuration, the Ingress device cannot access these private IP addresses. Also, manually configuring the network to ensure such reachability is cumbersome in Kubernetes environments. 
 
-**Chorus** provides a microservice called as **kube-router** that you can use to create the network between the cluster and the Ingress devices.
+**Chorus** provides a microservice plugin called as **kube-router** that you can use to create the network between the cluster and the Ingress devices.
+
+# Supported platforms
+
+The **kube-router** is supported on the following platforms:
+
+-  Kubernetes v1.10 and later
+-  Red Hat OpenShift version 3.11 and later
 
 # Architecture
 
