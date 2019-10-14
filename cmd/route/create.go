@@ -321,7 +321,7 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
         if err != nil {
               fmt.Errorf("pod Get API error: %v \n pod: %v", err, pod)
         }
-        //err = api.Client.CoreV1().Pods(input.NameSpace).Delete(pod.Name, metav1.NewDeleteOptions(90))
-	//fmt.Println("DELETED POD", err)
+        err = api.Client.CoreV1().Pods(input.NameSpace).Delete(pod.Name, metav1.NewDeleteOptions(90))
+	fmt.Println("DELETED POD", err)
 }
 
