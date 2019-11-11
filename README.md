@@ -16,7 +16,7 @@
 
 
   +  [Overview](#overview)
-  +  [Supported platform](#supported platform)
+  +  [Supported platforms](#supported platform)
   +  [Architecture](#architecture)
   +  [How it works](#how-it-works)
   +  [Get started](#get-started)
