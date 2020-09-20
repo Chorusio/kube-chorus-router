@@ -104,11 +104,9 @@ Chorus kube-router can be used in the following two ways:
   
 ## Using kube-router as a package
 
-You can use kube router as package by importing. There are two API provided Create() and Delete(). Inputs have to given in the form of enviornment variables. 
+kube router can be used as package by importing. There are two API is available Create() and Delete().
+Inputs have to given in the form of enviornment variables.
 
-
-Perform the following:
-  
 ## Using kube-router as a process
 
 Before you deploy the kube-router package, ensure that you have installed Go binary for running kube-router.
