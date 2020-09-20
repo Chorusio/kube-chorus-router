@@ -1,0 +1,78 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kube-chorus-router
+rules:
+  - apiGroups: ["*"]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+
+  - apiGroups: [""]
+    resources: ["nodes", "configmaps", "pods", "namespaces", "serviceaccounts", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "patch", "delete", "update"]
+
+  - apiGroups: ["extensions"]
+    resources: ["pods", "configmaps", "serviceaccounts", "ingresses/status"]
+    verbs: ["get", "list", "watch", "create"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kube-chorus-router
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-chorus-router
+subjects:
+- kind: ServiceAccount
+  name: kube-chorus-router
+  namespace: default
+apiVersion: rbac.authorization.k8s.io/v1
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-chorus-router
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube-chorus-router
+  labels:
+    app: kube-chorus-router
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+  selector:
+    app: kube-chorus-router
+---
+apiVersion: apps/v1 #  for k8s versions before 1.9.0 use apps/v1beta2  and before 1.8.0 use extensions/v1beta1
+kind: Deployment
+metadata:
+  name: kube-chorus-router
+spec:
+  selector:
+    matchLabels:
+      app: kube-chorus-router
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kube-chorus-router
+    spec:
+      serviceAccountName: kube-chorus-router
+      containers:
+      - name: kube-chorus-router
+        image: "quay.io/chorus/chorus-kube-router:latest"
+        imagePullPolicy: Always
+        env:
+        - name: NETWORK
+          value: "192.168.254.0/24"
+        - name: VNID
+          value: "200"
+        - name: VXLAN_PORT
+          value: "8472"
+        - name: REMOTE_VTEPIP
+          value: "10.102.33.209"
