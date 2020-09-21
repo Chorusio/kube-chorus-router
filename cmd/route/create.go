@@ -341,7 +341,8 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
 	for {        
 		res, err := api.Client.CoreV1().Pods(input.NameSpace).Get(pod.Name, metav1.GetOptions{})
         	if err != nil {
-              		fmt.Errorf("pod Get API error: %v \n pod: %v", err, pod)
+              		fmt.Errorf("pod Get API error: %v \n pod: %v", err, pod.Name)
+			break
         	}
 		if res.ObjectMeta.Name == ""{
 			break

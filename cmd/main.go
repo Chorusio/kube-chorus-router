@@ -15,7 +15,7 @@
 // Package main Kube Route Extender.
 package main
 import (
-	route "kube-chorus-router/cmd/route"
+	route "github.com/Chorusio/kube-chorus-router/cmd/route"
 )
 
 func main(){

@@ -1,4 +1,4 @@
-module kube-chorus-router
+module github.com/Chorusio/kube-chorus-router
 
 require (
 	github.com/evanphx/json-patch v4.5.0+incompatible // indirect
