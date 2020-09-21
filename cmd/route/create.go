@@ -352,6 +352,4 @@ func (api *KubernetesAPIServer)CreateKubeExtenderPod(obj interface{}, node *Node
         if _, err = api.Client.CoreV1().Pods(input.NameSpace).Create(pod); err != nil {
               klog.Error("Failed to Create a Pod " + err.Error())
         }
-	klog.Infof("Cleaning pods created by kube-chorus-router...")
-        err = api.Client.CoreV1().Pods(input.NameSpace).Delete(pod.Name, metav1.NewDeleteOptions(90))
 }
