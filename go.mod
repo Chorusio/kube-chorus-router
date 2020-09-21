@@ -1,4 +1,4 @@
-module k8s-route-extender
+module kube-chorus-router
 
 require (
 	github.com/evanphx/json-patch v4.5.0+incompatible // indirect

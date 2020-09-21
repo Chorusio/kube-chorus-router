@@ -38,6 +38,8 @@ var (
 	err        error
 )
 
+// GenerateUUID create a new unique number and returns in string format.
+// This function uses Google UUID package to create a new UUID.
 func GenerateUUID() string {
         uuid := uuid.New()
         s := uuid.String()
@@ -64,7 +66,9 @@ type QueueUpdate struct {
 }
 
 
-// This creates go client.
+// CreateK8sApiserverClient creates a kubernetes client interface. 
+// If the chorus router is running inside cluster it takes default Service account and generate the k8s client API interface.
+// If the chorus runs outside it looks for config file in kubeconfig location and creates the client API interface.
 func CreateK8sApiserverClient() (*KubernetesAPIServer, error) {
 	klog.Infof("Creating Kube API Client")
 	api := &KubernetesAPIServer{}
@@ -127,7 +131,7 @@ func (api *KubernetesAPIServer)CreateK8sConfigMap(input *Input)(string, error){
 		klog.Infof("Created Configmap kube-chorus-router is %v", configMaps)
 		return "kube-chorus-router", err
 	}else{
-		klog.Errorf("Failed to create configmap kube-chorus-router", err)
+		klog.Errorf("Failed to create configmap kube-chorus-router %v", err)
 		return "Error", err
 	}
 }

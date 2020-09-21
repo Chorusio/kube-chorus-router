@@ -14,7 +14,8 @@ test:
 	@echo $(TRAVIS_COMMIT_MESSAGE)
 	go test -v ../... -coverprofile cp.out
 	go tool cover -html=cp.out -o cover.html
-
+doc:
+	cd ../cmd;godoc -http=:9090
 run:
 	cd ../cmd;go run .
 coverage:

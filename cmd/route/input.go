@@ -176,7 +176,7 @@ func InitializeNodeIP(input *Input){
 		HostMax = SubnetMasked[0]+"."+strconv.Itoa(255-network)+"255.255"
 		RemoteIP = SubnetMasked[0]+"."+strconv.Itoa(255-network-1)+"254.254"
         }
-	klog.Infof("Host max is %v", HostMax, "Remote IP is %v", RemoteIP)
+	klog.Infof("Host max is %v and Remote IP is %v", HostMax, RemoteIP)
 	input.NextAddress = Network
 	input.RemoteIP = RemoteIP
 }
